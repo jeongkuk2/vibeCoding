@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>거래처별 매출 분석 보고서</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>거래처별 매출 분석 보고서</h1>
+    
+    <h2>1. 거래 현황</h2>
+    <p>본 보고서는 2025년 1월 1일부터 2025년 4월 30일까지의 거래 데이터를 기반으로 작성되었습니다.</p>
+    
+    <h2>2. 거래 형태별 분석</h2>
+    <p>총 거래 건수 120건 중 매입 거래가 68건, 매출 거래가 52건으로 매입 거래가 더 큰 비중을 차지했습니다.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>거래 형태</th>
+                <th>거래 건수 (건)</th>
+                <th>총 거래액 (원)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>매입</td>
+                <td>68</td>
+                <td>35,305,723</td>
+            </tr>
+            <tr>
+                <td>매출</td>
+                <td>52</td>
+                <td>25,504,358</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. 주요 거래처별 거래액 현황</h2>
+    <p>거래처별 총 거래액을 분석한 결과, 스타유통이 10,595,117원으로 가장 높은 거래액을 기록하며 가장 중요한 거래처로 파악되었습니다.</p>
+    <canvas id="salesChart"></canvas>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 예시 데이터 (실제 CSV 파일 데이터로 대체 필요)
+    const transactionData = {
+        '스타유통': {'매출': 10595117, '매입': 0},
+        '그린푸드': {'매출': 0, '매입': 8905921},
+        '삼정유통': {'매출': 8807887, '매입': 0},
+        '에코마트': {'매출': 0, '매입': 8506424},
+        '더블유상회': {'매출': 8298625, '매입': 0},
+        '한빛상사': {'매출': 0, '매입': 7473121},
+        '동서상사': {'매출': 4721129, '매입': 0},
+        '대림상회': {'매출': 0, '매입': 3501857}
+    };
+
+    const vendors = Object.keys(transactionData);
+    const salesData = vendors.map(vendor => transactionData[vendor]['매출'] || 0);
+    const purchaseData = vendors.map(vendor => transactionData[vendor]['매입'] || 0);
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: vendors,
+            datasets: [
+                {
+                    label: '매출액 (원)',
+                    data: salesData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: '매입액 (원)',
+                    data: purchaseData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: '거래처명'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '거래액 (원)'
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(200, 200, 200, 0.5)'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('ko-KR').format(context.parsed.y) + '원';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
